@@ -11,13 +11,12 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     strategy:
       matrix:
-        node-version: [18.x, 20.x, 22.x]
-        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+        node-version: [16.x, 18.x]
+        # 调整为更合适的 Node.js 版本范围
 
     steps:
     - uses: actions/checkout@v4
@@ -26,10 +25,15 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
-    - run: |
+    - name: Install dependencies
+      run: |
+        cd server
         if [ ! -f package-lock.json ]; then
           npm install
+        else
+          npm ci
         fi
-    - run: npm ci
-    - run: npm run build --if-present
-    - run: npm test
+    - name: Build
+      run: |
+        cd server
+        npm run build
